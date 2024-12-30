@@ -6,6 +6,7 @@ import authRouter from "./router/auth.routes";
 import gameRouter from "./router/game.routes";
 import currencyRouter from "./router/currency.routes";
 import orderRoute from "./router/order.routes";
+import { isAuthenticated } from "./middleware/index";
 
 const app = express();
 

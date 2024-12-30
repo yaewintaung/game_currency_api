@@ -14,13 +14,24 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  email    String? @unique
-  username String
-  phone    String? @unique
-  password String?
+  id                String              @id @default(cuid())
+  email             String              @unique
+  username          String
+  phone             String?             @unique
+  password          String
+  verified          Boolean             @default(false)
+  EmailVerification EmailVerification[]
 
   @@unique([email, phone], name: "unique_email_or_phone")
+}
+
+model EmailVerification {
+  id         String   @id @default(cuid())
+  userId     String
+  hashedCode String
+  expiredAt  DateTime
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 model Game {

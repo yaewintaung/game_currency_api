@@ -1,5 +1,4 @@
 import express from "express";
-import { getUsers } from "../controllers/user.controller";
 import {
   createGame,
   deleteGame,
@@ -8,10 +7,11 @@ import {
   updateGame,
 } from "../controllers/game.controller";
 import { getCurrenciesByGameId } from "../controllers/currency.controller";
+import { isAuthenticated } from "../middleware";
 
 const gameRouter = express.Router();
 
-gameRouter.get("/games", getGames);
+gameRouter.get("/games/", isAuthenticated, getGames);
 gameRouter.get("/games/:id", getGame);
 gameRouter.get("/games/currency/:id", getCurrenciesByGameId);
 gameRouter.post("/games", createGame);
