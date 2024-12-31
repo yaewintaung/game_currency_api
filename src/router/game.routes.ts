@@ -13,7 +13,7 @@ const gameRouter = express.Router();
 
 gameRouter.get("/games/", isAuthenticated, getGames);
 gameRouter.get("/games/:id", getGame);
-gameRouter.get("/games/currency/:id", getCurrenciesByGameId);
+gameRouter.get("/games/currency/:gameId", getCurrenciesByGameId);
 gameRouter.post("/games", createGame);
 gameRouter.patch("/games/:id", updateGame);
 gameRouter.delete("/games/:id", deleteGame);
