@@ -9,6 +9,12 @@ export const getGameById = async (id: string): Promise<Game | null> => {
   return await prisma.game.findUnique({ where: { id } });
 };
 
+export const getGameByGameName = async (
+  gameName: string
+): Promise<Game | null> => {
+  return await prisma.game.findFirst({ where: { gameName } });
+};
+
 export const addNewGame = async (data: {
   gameName: string;
   image: string;
