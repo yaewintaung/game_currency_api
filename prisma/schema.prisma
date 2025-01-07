@@ -21,6 +21,7 @@ model User {
   password          String
   verified          Boolean             @default(false)
   EmailVerification EmailVerification[]
+  Order             Order[]
 
   @@unique([email, phone], name: "unique_email_or_phone")
 }
@@ -55,9 +56,12 @@ model CurrencyPricing {
 }
 
 model Order {
-  id              String          @id @default(cuid())
-  currencyId      String
-  userId          String
-  createdAt       DateTime        @default(now())
-  currencyPricing CurrencyPricing @relation(fields: [currencyId], references: [id])
+  id                String          @id @default(cuid())
+  currencyId        String
+  userId            String
+  notes             String?
+  paymentScreenshot String
+  createdAt         DateTime        @default(now())
+  currencyPricing   CurrencyPricing @relation(fields: [currencyId], references: [id])
+  user              User            @relation(fields: [userId], references: [id])
 }

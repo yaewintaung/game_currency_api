@@ -20,6 +20,7 @@ export const getOrderById = async (id: string) => {
 export const addOrder = async (data: {
   currencyId: string;
   userId: string;
+  paymentScreenshot: string;
 }): Promise<Order | null> => {
   return await prisma.order.create({ data });
 };

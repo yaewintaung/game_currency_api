@@ -12,6 +12,8 @@ import ErrorMessage from "../util/ErrorMessage";
 import { uploadCloudinary, deleteFile } from "../util/uploadCloudinary";
 import { uniqueNameGen } from "../util/generators";
 
+const cloudinaryFolderName: string = "game_images";
+
 export const getGames = async (req: Request, res: Response) => {
   try {
     // Call the getAllGames function from the service
@@ -56,7 +58,11 @@ export const createGame = async (req: Request, res: Response) => {
     const { path, originalname } = req.file;
     const fileName = uniqueNameGen(originalname);
     const publicId = fileName.substring(0, fileName.lastIndexOf("."));
-    const uploadFile = await uploadCloudinary(path, publicId);
+    const uploadFile = await uploadCloudinary(
+      path,
+      publicId,
+      cloudinaryFolderName
+    );
 
     if (!uploadFile) {
       res.status(400).json({ message: "Error uploading image" });
@@ -94,12 +100,19 @@ export const updateGame = async (
 
     if (req.file) {
       if (game.image) {
-        const resultDeleteImage = await deleteFile(game.image);
+        const resultDeleteImage = await deleteFile(
+          game.image,
+          cloudinaryFolderName
+        );
       }
       const { path, originalname } = req.file;
       fileName = uniqueNameGen(originalname);
       const publicId = fileName.substring(0, fileName.lastIndexOf("."));
-      const uploadFile = await uploadCloudinary(path, publicId);
+      const uploadFile = await uploadCloudinary(
+        path,
+        publicId,
+        cloudinaryFolderName
+      );
     }
 
     // Call the updateGame function from the service
@@ -127,7 +140,7 @@ export const deleteGame = async (
       return;
     }
     if (game.image) {
-      await deleteFile(game.image);
+      await deleteFile(game.image, cloudinaryFolderName);
     }
 
     // Call the deleteGame function from the service

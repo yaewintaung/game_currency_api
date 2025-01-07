@@ -7,6 +7,9 @@ import {
   removeOrder,
 } from "../services/order.service";
 import ErrorMessage from "../util/ErrorMessage";
+import { uniqueNameGen } from "../util/generators";
+import { deleteFile, uploadCloudinary } from "../util/uploadCloudinary";
+const cloudinaryFolderName = "screenshots";
 
 export const getAllOrders = async (req: Request, res: Response) => {
   try {
@@ -37,9 +40,31 @@ export const getOrder = async (req: Request, res: Response): Promise<void> => {
 
 export const createOrder = async (req: Request, res: Response) => {
   try {
-    const { currencyId, userId } = req.body;
+    const { userId, currencyId } = req.body;
+
+    if (!req.file) {
+      res.status(404).json({ message: "file not found" });
+      return;
+    }
+    const { path, originalname } = req.file;
+    const fileName = uniqueNameGen(originalname);
+    const publicId = fileName.substring(0, fileName.lastIndexOf("."));
+    const uploadFile = await uploadCloudinary(
+      path,
+      publicId,
+      cloudinaryFolderName
+    );
+
+    if (!uploadFile) {
+      res.status(400).json({ message: "Error uploading image" });
+      return;
+    }
     // Call the addOrder function from the service
-    const order = await addOrder({ currencyId, userId });
+    const order = await addOrder({
+      currencyId,
+      userId,
+      paymentScreenshot: fileName,
+    });
     // Send a response with the created order
     res.status(200).json({ order, message: "Order created successfully" });
   } catch (error) {
@@ -54,10 +79,27 @@ export const updateOrder = async (
   try {
     const { id } = req.params;
     const { currencyId, userId } = req.body;
-    const order = getOrderById(id);
+    const order = await getOrderById(id);
     if (!order) {
       res.status(404).json({ message: "Order not found" });
       return;
+    }
+    let fileName;
+    if (req.file) {
+      if (order.paymentScreenshot) {
+        const resultDeleteImage = await deleteFile(
+          order.paymentScreenshot,
+          cloudinaryFolderName
+        );
+      }
+      const { path, originalname } = req.file;
+      fileName = uniqueNameGen(originalname);
+      const publicId = fileName.substring(0, fileName.lastIndexOf("."));
+      const uploadFile = await uploadCloudinary(
+        path,
+        publicId,
+        cloudinaryFolderName
+      );
     }
 
     // Call the editOrder function from the service
@@ -77,10 +119,13 @@ export const deleteOrder = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const order = getOrderById(id);
+    const order = await getOrderById(id);
     if (!order) {
       res.status(404).json({ message: "Order not found" });
       return;
+    }
+    if (order.paymentScreenshot) {
+      await deleteFile(order.paymentScreenshot, cloudinaryFolderName);
     }
     // Call the deleteOrder function from the service
     await removeOrder(id);

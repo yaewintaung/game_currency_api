@@ -8,12 +8,16 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
-export const uploadCloudinary = async (path: string, publicId: string) => {
+export const uploadCloudinary = async (
+  path: string,
+  publicId: string,
+  folderName: string
+) => {
   const result = await cloudinary.uploader.upload(
     path,
     {
       resource_type: "auto",
-      folder: "game_images",
+      folder: folderName,
       public_id: publicId,
     },
     async (error, result) => {
@@ -27,9 +31,9 @@ export const uploadCloudinary = async (path: string, publicId: string) => {
   return result;
 };
 
-export const deleteFile = async (imageName: string) => {
+export const deleteFile = async (imageName: string, folderName: string) => {
   const publicId = imageName.substring(0, imageName.lastIndexOf("."));
 
-  const result = await cloudinary.uploader.destroy("game_images/" + publicId);
+  const result = await cloudinary.uploader.destroy(folderName + "/" + publicId);
   return result;
 };
